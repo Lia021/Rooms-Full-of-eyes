@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <script src="https://aframe.io/releases/0.3.0/aframe.min.js"></script>
+  <script src="https://sdk.altvr.com/libs/altspace.js/2.0.3/altspace.min.js"></script>
+  <script>
+    // n-skeleton-parent only works with root meshes at the moment. Since most model loaders use a root
+    // container object, we need to collapse the model so that n-skeleton-parent can access the mesh directly.
+    AFRAME.registerComponent('collapse-model', {
+        init: function () {
+            this.el.addEventListener('model-loaded', function () {
+                this.el.object3DMap.mesh.updateMatrixWorld();
+                var mesh;
+                this.el.object3DMap.mesh.traverse(function (obj) {
+                    if (!mesh && obj instanceof THREE.Mesh) {
+                        mesh = obj;
+                    }
+                }.bind(this))
+                if (mesh) {
+                    mesh.scale.copy(mesh.getWorldScale());
+                    this.el.setObject3D('mesh', mesh);
+                    // setObject3D emits this event in a-frame 0.4.0
+                    this.el.emit('object3dset', {
+                        type: 'mesh'
+                    });
+                }
+            }.bind(this));
+        }
+    });
+  </script>
+
+  <body>
+    <a-scene altspace=fullspace:true sync-system="author: bookgirl; app: eyes-Rooms">
+      <a-assets>
+         <a-asset-item id="eye-blue" src="https://rawgit.com/Lia021/model/master/theater/lia%20theater2.dae"></a-asset-item>
+        
+        </a-assets>
+        <!--model-->
+    <a-assets>
+      <a-asset-item id="eye-blue" src="https://rawgit.com/Lia021/eyeball/master/eyeball.dae"></a-asset-item>
+    </a-assets>
+    <a-entity position="0 4.5 0" altspace-look-at>
+      <a-entity position="0 -1 -1" rotation="0 -90 0" scale="2 2 2" collada-model="#eye-blue"></a-entity>
+    </a-entity>
+
+
+
+</body>
+</html>
